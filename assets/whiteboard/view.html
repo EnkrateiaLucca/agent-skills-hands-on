@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Agent Skills Whiteboard</title>
+<link rel="stylesheet" href="https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/prod/index.css">
+<style>html,body,#root{margin:0;height:100%;background:#fff}</style>
+<script>window.EXCALIDRAW_ASSET_PATH = "https://unpkg.com/@excalidraw/excalidraw@0.18.0/dist/prod/";</script>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+import React from "https://esm.sh/react@18.3.1";
+import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
+import { Excalidraw } from "https://esm.sh/@excalidraw/excalidraw@0.18.0?deps=react@18.3.1,react-dom@18.3.1";
+
+const scene = await (await fetch("agent-skills-whiteboard.excalidraw")).json();
+window.scene = scene;
+createRoot(document.getElementById("root")).render(
+  React.createElement(Excalidraw, {
+    initialData: { ...scene, scrollToContent: true },
+    excalidrawAPI: (api) => (window.api = api),
+  })
+);
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "_comment": "Anchors the CPM to what Lucas actually charges. anchor_median_views is set once from live stats (run rate_calc.py --calibrate), then frozen so the quote scales as the channel grows instead of being circular.",
+  "anchor_median_views": null,
+  "calibrated_at": null,
+  "anchors_usd": {
+    "dedicated": 3500,
+    "integrated": 3300,
+    "short": 1200
+  },
+  "_anchor_provenance": {
+    "dedicated": "observed: $3,500 quoted to TEC-DO/Tripo3D and MiniMax, Jun-Aug 2026",
+    "integrated": "observed: EUR 3,000 quoted to Supermemory Aug 2026, converted at 0.92",
+    "short": "derived, never quoted - provisional"
+  },
+  "anchor_median_views_shorts": null
+}

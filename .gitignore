@@ -1,0 +1,6 @@
+.env
+.DS_Store
+.claude/
+assets/demo-data/
+assets/session-logs/
+assets/skills/packaged/sponsor-reply-skill.zip
