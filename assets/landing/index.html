@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Claude Code Skills Primer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one 1080px column; asymmetric hero (claim left, live terminal right); each section pairs a short claim with one interactive exhibit. Brand v2.1, monochrome. */
+:root {
+  --bg: #FFFFFF;
+  --fg: #0A0A0A;
+  --fg-2: #3D3D3D;
+  --fg-3: #595959;
+  --line: #E5E5E5;
+  --panel: #FAFAFA;
+  --ink: #0A0A0A;
+  --ink-fg: #FFFFFF;
+  --ink-muted: #A3A3A3;
+  --ink-line: #2B2B2B;
+  --fill-1: #0A0A0A;
+  --fill-2: #595959;
+  --fill-3: #A3A3A3;
+  --display: "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0A0A0A; --fg: #FFFFFF; --fg-2: #D4D4D4; --fg-3: #A3A3A3; --line: #2B2B2B; --panel: #141414;
+    --ink: #161616; --ink-fg: #FFFFFF; --ink-muted: #A3A3A3; --ink-line: #333333;
+    --fill-1: #FFFFFF; --fill-2: #A3A3A3; --fill-3: #595959; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0A0A0A; --fg: #FFFFFF; --fg-2: #D4D4D4; --fg-3: #A3A3A3; --line: #2B2B2B; --panel: #141414;
+  --ink: #161616; --ink-fg: #FFFFFF; --ink-muted: #A3A3A3; --ink-line: #333333;
+  --fill-1: #FFFFFF; --fill-2: #A3A3A3; --fill-3: #595959; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--fg);
+  font: 400 16px/1.55 var(--display);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1, h2, h3 { text-wrap: balance; margin: 0; font-weight: 600; }
+h1 { font-size: clamp(40px, 6.4vw, 72px); line-height: 1.0; letter-spacing: -0.035em; }
+h2 { font-size: clamp(30px, 4vw, 40px); line-height: 1.1; letter-spacing: -0.025em; }
+h3 { font-size: 22px; line-height: 1.2; letter-spacing: -0.015em; }
+p { margin: 0; }
+.lede { font-size: 20px; line-height: 1.5; color: var(--fg-2); max-width: 34em; }
+.body { font-size: 17px; line-height: 1.6; color: var(--fg-2); max-width: 38em; }
+.kicker { font: 400 13px/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); }
+code, .mono { font-family: var(--mono); font-size: 0.88em; }
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; border-radius: 4px; }
+
+/* top bar */
+.top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 24px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.mark { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -0.01em; }
+.mark i { width: 18px; height: 18px; background: var(--fg); border-radius: 4px; display: block; }
+.top nav { display: flex; gap: 20px; flex-wrap: wrap; }
+.top nav a { color: var(--fg-3); text-decoration: none; font: 400 12px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.top nav a:hover { color: var(--fg); }
+
+/* hero */
+.hero { display: grid; grid-template-columns: 1fr 1.05fr; gap: 56px; align-items: center; padding-block: 72px 88px; }
+.hero > * { min-width: 0; }
+.hero .copy { display: grid; gap: 24px; }
+.btns { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn { font: 500 16px/1 var(--display); height: 52px; padding: 0 24px; border-radius: 6px; border: 1px solid var(--fg); background: var(--fg); color: var(--bg); cursor: pointer; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; transition: transform .15s ease, opacity .15s; }
+.btn:hover { opacity: .88; }
+.btn:active { transform: scale(.98); }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--fg); opacity: 1; }
+.btn.sm { height: 38px; padding: 0 16px; font-size: 14px; }
+
+/* terminal */
+.term { background: var(--ink); color: var(--ink-fg); border-radius: 10px; border: 1px solid var(--ink-line); font: 400 13.5px/1.6 var(--mono); overflow: hidden; box-shadow: 0 30px 60px -30px rgba(0,0,0,.45); }
+.term-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--ink-line); color: var(--ink-muted); font-size: 12px; }
+.term-bar b { width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--ink-muted); display: block; }
+.term-bar span { margin-left: 8px; }
+.term-body { padding: 18px 18px 20px; min-height: 340px; overflow-x: auto; }
+.term-body .ln { white-space: pre-wrap; word-break: break-word; opacity: 0; transform: translateY(4px); animation: ln .28s ease forwards; }
+@keyframes ln { to { opacity: 1; transform: none; } }
+.t-user { color: var(--ink-fg); }
+.t-user::before { content: "> "; color: var(--ink-muted); }
+.t-tool { color: var(--ink-fg); }
+.t-tool em { font-style: normal; background: var(--ink-fg); color: var(--ink); padding: 0 6px; border-radius: 3px; margin-right: 6px; }
+.t-dim { color: var(--ink-muted); }
+.t-ok { color: var(--ink-fg); font-weight: 500; }
+.caret { display: inline-block; width: 8px; height: 1.1em; background: var(--ink-fg); vertical-align: -2px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.term-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px; border-top: 1px solid var(--ink-line); color: var(--ink-muted); font-size: 12px; flex-wrap: wrap; }
+.term-foot button { font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-fg); background: transparent; border: 1px solid var(--ink-line); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+.term-foot button:hover { border-color: var(--ink-fg); }
+
+/* sections */
+section { padding-block: 88px; border-top: 1px solid var(--line); }
+.sec-head { display: grid; gap: 16px; margin-bottom: 40px; }
+
+/* loop */
+.loop { display: grid; grid-template-columns: minmax(0, 420px) 1fr; gap: 48px; align-items: center; }
+.loop > * { min-width: 0; }
+.loop svg { width: 100%; height: auto; max-width: 420px; display: block; }
+.loop svg text { font-family: var(--display); fill: var(--fg); }
+.node { cursor: pointer; }
+.node circle { fill: var(--bg); stroke: var(--line); stroke-width: 1.5; transition: fill .2s, stroke .2s; }
+.node:hover circle { stroke: var(--fg); }
+.node.on circle { fill: var(--fg); stroke: var(--fg); }
+.node.on text { fill: var(--bg); }
+.node text.sub { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; fill: var(--fg-3); }
+.node.on text.sub { fill: var(--bg); opacity: .7; }
+.ring { fill: none; stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 4 6; }
+.dot { fill: var(--fg); }
+.center-t { font-size: 13px; fill: var(--fg-3) !important; font-family: var(--mono) !important; letter-spacing: .08em; }
+.loop-detail { display: grid; gap: 16px; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag { font: 400 12px/1 var(--mono); letter-spacing: .04em; color: var(--fg-2); border: 1px solid var(--line); border-radius: 999px; padding: 7px 12px; background: var(--bg); }
+.example { background: var(--panel); border-radius: 6px; padding: 16px; font: 400 13px/1.6 var(--mono); color: var(--fg-2); overflow-x: auto; white-space: pre; }
+
+/* anatomy */
+.anatomy { display: grid; grid-template-columns: 280px 1fr; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.anatomy > * { min-width: 0; }
+.tree { background: var(--panel); padding: 16px 8px; border-right: 1px solid var(--line); font: 400 13px/1 var(--mono); }
+.tree button { display: flex; width: 100%; align-items: center; gap: 8px; text-align: left; font: inherit; color: var(--fg-2); background: none; border: 0; border-radius: 6px; padding: 9px 10px; cursor: pointer; }
+.tree button:hover { background: var(--bg); color: var(--fg); }
+.tree button.on { background: var(--fg); color: var(--bg); }
+.tree .dir { color: var(--fg-3); padding: 14px 10px 6px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.tree .ind { padding-left: 26px; }
+.tree small { margin-left: auto; font-size: 10.5px; opacity: .65; }
+.viewer { display: grid; grid-template-rows: auto 1fr; }
+.viewer-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.viewer-head strong { font-family: var(--mono); font-size: 13px; font-weight: 500; }
+.viewer-head span { font-size: 14px; color: var(--fg-3); }
+.viewer pre { margin: 0; padding: 20px; font: 400 13px/1.65 var(--mono); color: var(--fg-2); overflow-x: auto; white-space: pre-wrap; word-break: break-word; max-height: 380px; }
+.viewer pre .k { color: var(--fg); font-weight: 500; }
+.viewer pre .c { color: var(--fg-3); }
+.when { padding: 14px 20px; border-top: 1px solid var(--line); font-size: 14px; color: var(--fg-2); background: var(--panel); }
+.when b { font-weight: 600; color: var(--fg); }
+
+/* disclosure */
+.disc { display: grid; gap: 28px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.chips .lbl { margin-right: 6px; }
+.chip { font: 400 14px/1.2 var(--display); border: 1px solid var(--line); background: var(--bg); color: var(--fg-2); border-radius: 999px; padding: 10px 16px; cursor: pointer; text-align: left; }
+.chip:hover { border-color: var(--fg); color: var(--fg); }
+.chip.on { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+.skills-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.sk { border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 8px; transition: border-color .25s, background .25s; align-content: start; }
+.sk .nm { font: 500 13px/1.2 var(--mono); display: flex; justify-content: space-between; gap: 8px; }
+.sk .st { font: 400 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
+.sk p { font-size: 14px; color: var(--fg-3); line-height: 1.45; }
+.sk.hit { border-color: var(--fg); background: var(--panel); }
+.sk.hit .st { color: var(--fg); }
+.levels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.lv { border-top: 2px solid var(--line); padding-top: 12px; display: grid; gap: 6px; transition: border-color .3s, opacity .3s; opacity: .45; }
+.lv.on { border-color: var(--fg); opacity: 1; }
+.lv .kicker { font-size: 11px; }
+.lv b { font-weight: 600; font-size: 16px; }
+.lv span { font-size: 14px; color: var(--fg-2); }
+.meter { display: grid; gap: 10px; }
+.meter-row { display: grid; grid-template-columns: 140px 1fr 90px; gap: 14px; align-items: center; font-size: 14px; }
+.meter-row > * { min-width: 0; }
+.bar { height: 26px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; display: flex; overflow: hidden; }
+.bar i { display: block; height: 100%; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+.bar .f1 { background: var(--fill-1); }
+.bar .f2 { background: var(--fill-2); }
+.bar .f3 { background: repeating-linear-gradient(135deg, var(--fill-3) 0 4px, transparent 4px 8px); }
+.bar .f0 { background: repeating-linear-gradient(135deg, var(--fill-2) 0 2px, transparent 2px 6px); }
+.num { font: 500 13px/1 var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--fg-3); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend i { width: 14px; height: 10px; border-radius: 2px; display: inline-block; border: 1px solid var(--line); }
+.ctrl { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.note { font-size: 13px; color: var(--fg-3); }
+.verdict { font-size: 17px; color: var(--fg); min-height: 1.6em; }
+
+/* compare */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: 15px; }
+th, td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 400 11px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); background: var(--panel); }
+td:first-child { font-weight: 600; white-space: nowrap; }
+td { color: var(--fg-2); }
+tr:last-child td { border-bottom: 0; }
+tr.me td { background: var(--panel); color: var(--fg); }
+
+/* builder */
+.build { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.build > * { min-width: 0; }
+.form { display: grid; gap: 16px; align-content: start; }
+label { display: grid; gap: 6px; font: 400 12px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
+input, textarea { font: 400 15px/1.5 var(--display); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; width: 100%; text-transform: none; letter-spacing: 0; }
+input:focus, textarea:focus { outline: none; border-color: var(--fg); }
+textarea { resize: vertical; min-height: 120px; }
+.preview { background: var(--ink); color: var(--ink-fg); border-radius: 10px; border: 1px solid var(--ink-line); display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+.preview pre { margin: 0; padding: 18px; font: 400 13px/1.65 var(--mono); white-space: pre-wrap; word-break: break-word; color: var(--ink-fg); }
+.preview pre .c { color: var(--ink-muted); }
+.test { grid-column: 1 / -1; border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 14px; }
+.match { display: grid; grid-template-columns: 1fr 64px; gap: 14px; align-items: center; }
+.match .bar { height: 14px; }
+.words { display: flex; gap: 6px; flex-wrap: wrap; min-height: 28px; }
+.words .tag.hit { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+/* install */
+.install { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.loc { border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: grid; gap: 10px; align-content: start; }
+.loc code { font-size: 12.5px; word-break: break-all; color: var(--fg); }
+.loc p { font-size: 14px; color: var(--fg-2); }
+.cmd { margin-top: 20px; display: flex; gap: 12px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 12px 12px 16px; }
+.cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; font-size: 13px; }
+
+footer { border-top: 1px solid var(--line); padding-block: 32px 48px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--fg-3); font-size: 14px; }
+footer a { color: var(--fg); }
+
+@media (max-width: 860px) {
+  .hero, .loop, .build { grid-template-columns: 1fr; }
+  .hero { padding-block: 40px 56px; gap: 36px; }
+  .anatomy { grid-template-columns: 1fr; }
+  .tree { border-right: 0; border-bottom: 1px solid var(--line); }
+  .skills-row, .levels, .install { grid-template-columns: 1fr; }
+  .meter-row { grid-template-columns: 1fr 80px; }
+  .meter-row .bar { grid-column: 1 / -1; grid-row: 2; }
+  section { padding-block: 64px; }
+  .loop svg { margin: 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="mark"><i></i>Hands-On Agent Skills</div>
+  <nav aria-label="Sections">
+    <a href="#loop">Loop</a><a href="#anatomy">Anatomy</a><a href="#disclosure">Loading</a><a href="#compare">Compare</a><a href="#build">Build</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="copy">
+    <p class="kicker">Claude Code + Agent Skills</p>
+    <h1>An agent in your terminal, and folders that teach it your job.</h1>
+    <p class="lede">Claude Code reads your files, runs commands and checks its own work. A Skill is a folder of instructions and scripts that Claude loads only when a task calls for it.</p>
+    <div class="btns">
+      <button class="btn" id="replay" type="button">Watch a Skill run</button>
+      <a class="btn ghost" href="#build">Write your own</a>
+    </div>
+  </div>
+  <div class="term" aria-label="Simulated Claude Code session">
+    <div class="term-bar"><b></b><b></b><b></b><span>~/sponsors — claude</span></div>
+    <div class="term-body" id="termBody" aria-live="polite"></div>
+    <div class="term-foot"><span id="termStatus">Simulated session</span><button type="button" id="termBtn">Replay</button></div>
+  </div>
+</div>
+
+<!-- LOOP -->
+<section id="loop">
+  <div class="sec-head">
+    <p class="kicker">How Claude Code works</p>
+    <h2>It runs a loop until the job is done.</h2>
+    <p class="body">You describe the outcome. Claude Code gathers context, acts with tools, checks the result and goes around again. Click a step to see what happens in it.</p>
+  </div>
+  <div class="loop">
+    <svg viewBox="0 0 420 400" role="group" aria-label="Agent loop diagram">
+      <circle class="ring" cx="210" cy="200" r="140"></circle>
+      <circle class="dot" id="loopDot" r="6" cx="210" cy="60"></circle>
+      <text class="center-t" x="210" y="196" text-anchor="middle">REPEAT</text>
+      <text class="center-t" x="210" y="214" text-anchor="middle">UNTIL DONE</text>
+      <g class="node on" data-step="0" tabindex="0" role="button" aria-label="Gather context">
+        <circle cx="210" cy="60" r="52"></circle>
+        <text x="210" y="58" text-anchor="middle" font-size="15" font-weight="600">Gather</text>
+        <text class="sub" x="210" y="76" text-anchor="middle">CONTEXT</text>
+      </g>
+      <g class="node" data-step="1" tabindex="0" role="button" aria-label="Take action">
+        <circle cx="331" cy="270" r="52"></circle>
+        <text x="331" y="268" text-anchor="middle" font-size="15" font-weight="600">Act</text>
+        <text class="sub" x="331" y="286" text-anchor="middle">WITH TOOLS</text>
+      </g>
+      <g class="node" data-step="2" tabindex="0" role="button" aria-label="Verify results">
+        <circle cx="89" cy="270" r="52"></circle>
+        <text x="89" y="268" text-anchor="middle" font-size="15" font-weight="600">Verify</text>
+        <text class="sub" x="89" y="286" text-anchor="middle">THE RESULT</text>
+      </g>
+    </svg>
+    <div class="loop-detail" aria-live="polite">
+      <p class="kicker" id="loopKicker">Step 1 of 3</p>
+      <h3 id="loopTitle">Gather context</h3>
+      <p class="body" id="loopText"></p>
+      <div class="tools" id="loopTools"></div>
+      <div class="example" id="loopEx"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ANATOMY -->
+<section id="anatomy">
+  <div class="sec-head">
+    <p class="kicker">What a Skill is</p>
+    <h2>A Skill is a folder with a SKILL.md inside.</h2>
+    <p class="body">This is <code>sponsor-reply</code>, the Skill we build in class. It triages a sponsorship email, researches the company, computes a rate from YouTube stats and drafts a reply. Click any file.</p>
+  </div>
+  <div class="anatomy">
+    <div class="tree" id="tree" role="tablist" aria-label="Skill files">
+      <div class="dir">sponsor-reply/</div>
+      <button type="button" class="on" data-f="skill">SKILL.md<small>~2.5k tok</small></button>
+      <div class="dir">references/</div>
+      <button type="button" class="ind" data-f="rate">rate-card.md<small>~1.5k</small></button>
+      <button type="button" class="ind" data-f="research">research-playbook.md<small>~1.1k</small></button>
+      <button type="button" class="ind" data-f="security">security-rubric.md<small>~0.8k</small></button>
+      <button type="button" class="ind" data-f="templates">reply-templates.md<small>~0.8k</small></button>
+      <div class="dir">scripts/</div>
+      <button type="button" class="ind" data-f="yt">yt_stats.py<small>runs</small></button>
+      <button type="button" class="ind" data-f="calc">rate_calc.py<small>runs</small></button>
+    </div>
+    <div class="viewer">
+      <div class="viewer-head"><strong id="vName">SKILL.md</strong><span id="vRole">The entry point</span></div>
+      <pre id="vBody"></pre>
+    </div>
+  </div>
+  <div class="when" id="vWhen" style="border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;margin-top:-1px"></div>
+</section>
+
+<!-- DISCLOSURE -->
+<section id="disclosure">
+  <div class="sec-head">
+    <p class="kicker">Progressive disclosure</p>
+    <h2>Claude loads a Skill in three steps, and only as far as the task needs.</h2>
+    <p class="body">At startup Claude sees each Skill's name and description and nothing else. It opens SKILL.md when a request matches, and it opens reference files or runs scripts only when the instructions point there. Pick a request and step through it.</p>
+  </div>
+  <div class="disc">
+    <div class="chips" role="radiogroup" aria-label="Pick a request">
+      <span class="kicker lbl">Request</span>
+      <button type="button" class="chip on" data-q="0" role="radio" aria-checked="true">"Acme wants a sponsored video. Worth it?"</button>
+      <button type="button" class="chip" data-q="1" role="radio" aria-checked="false">"Make a handout about RAG"</button>
+      <button type="button" class="chip" data-q="2" role="radio" aria-checked="false">"Fix the failing test in utils.py"</button>
+    </div>
+
+    <div class="skills-row" id="skRow"></div>
+
+    <div class="levels" id="levels">
+      <div class="lv" data-l="1"><span class="kicker">Level 1 · always</span><b>Name + description</b><span>Every installed Skill, about 30–200 tokens each.</span></div>
+      <div class="lv" data-l="2"><span class="kicker">Level 2 · on match</span><b>SKILL.md body</b><span>Read only when the request fits the description.</span></div>
+      <div class="lv" data-l="3"><span class="kicker">Level 3 · on demand</span><b>References and scripts</b><span>Files Claude opens as needed. Scripts run and only their output enters context.</span></div>
+    </div>
+
+    <div class="meter">
+      <div class="meter-row"><span>With Skills</span><div class="bar" id="barSkills"><i class="f1"></i><i class="f2"></i><i class="f3"></i></div><span class="num" id="numSkills">0</span></div>
+      <div class="meter-row"><span>Everything in the prompt</span><div class="bar"><i class="f0" id="barAll"></i></div><span class="num" id="numAll">0</span></div>
+      <div class="legend">
+        <span><i style="background:var(--fill-1)"></i>Metadata</span>
+        <span><i style="background:var(--fill-2)"></i>SKILL.md body</span>
+        <span><i style="background:repeating-linear-gradient(135deg,var(--fill-3) 0 4px,transparent 4px 8px)"></i>References + script output</span>
+      </div>
+    </div>
+
+    <div class="ctrl">
+      <button class="btn sm" type="button" id="stepBtn">Next step</button>
+      <button class="btn sm ghost" type="button" id="resetBtn">Reset</button>
+      <span class="verdict" id="verdict" aria-live="polite"></span>
+    </div>
+    <p class="note">Token counts come from the sizes of the course's Skill files at about 4 characters per token. A real context window holds 200k tokens or more; this chart shows a 12k slice.</p>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section id="compare">
+  <div class="sec-head">
+    <p class="kicker">Where Skills fit</p>
+    <h2>Five ways to shape what Claude Code does.</h2>
+    <p class="body">Each one answers a different question. Skills cover repeatable know-how that Claude should pick up on its own.</p>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Tool</th><th>When it loads</th><th>Who triggers it</th><th>Best for</th></tr></thead>
+      <tbody>
+        <tr><td>CLAUDE.md</td><td>Every session, in full</td><td>Always on</td><td>Project facts and house rules</td></tr>
+        <tr class="me"><td>Skill</td><td>Description always, body on match</td><td>Claude, or you with /name</td><td>Repeatable workflows with scripts and references</td></tr>
+        <tr><td>Slash command</td><td>When you type it</td><td>You</td><td>Prompts you reuse by hand</td></tr>
+        <tr><td>MCP server</td><td>Tool list at startup</td><td>Claude calls its tools</td><td>Live access to outside systems like Gmail or a database</td></tr>
+        <tr><td>Subagent</td><td>In its own context window</td><td>Claude delegates</td><td>Side tasks that would clutter the main thread</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- BUILD -->
+<section id="build">
+  <div class="sec-head">
+    <p class="kicker">Write one</p>
+    <h2>The description decides when your Skill fires.</h2>
+    <p class="body">Claude chooses a Skill by reading its description. Name the task, the trigger phrases and the situations where it applies. Edit the fields and test a request below.</p>
+  </div>
+  <div class="build">
+    <div class="form">
+      <label for="fName">name<input id="fName" value="meeting-notes" maxlength="64" autocomplete="off"></label>
+      <label for="fDesc">description<textarea id="fDesc">Turn a meeting transcript into notes with decisions, owners and deadlines. Use when the user shares a transcript, a recording, or says "summarize this call", "meeting notes" or "what did we decide".</textarea></label>
+      <label for="fBody">instructions<textarea id="fBody">1. Read the transcript.
+2. List every decision with its owner.
+3. List action items with deadlines.
+4. Save to notes/YYYY-MM-DD-meeting.md</textarea></label>
+    </div>
+    <div class="preview">
+      <div class="term-bar"><b></b><b></b><b></b><span id="pPath">.claude/skills/meeting-notes/SKILL.md</span></div>
+      <pre id="pBody"></pre>
+    </div>
+    <div class="test">
+      <label for="fTest">Try a request<input id="fTest" value="Can you summarize this call transcript?" autocomplete="off"></label>
+      <div class="match"><div class="bar"><i class="f1" id="mBar" style="width:0"></i></div><span class="num" id="mNum">0%</span></div>
+      <div class="words" id="mWords"></div>
+      <p class="note">This toy matcher counts shared words. Claude reads the description with full language understanding, so it also catches paraphrases. The lesson holds: concrete trigger phrases make a Skill fire reliably.</p>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section id="install">
+  <div class="sec-head">
+    <p class="kicker">Install</p>
+    <h2>Drop the folder where Claude Code looks.</h2>
+  </div>
+  <div class="install">
+    <div class="loc"><span class="kicker">Personal</span><code>~/.claude/skills/&lt;name&gt;/</code><p>Available in every project on your machine.</p></div>
+    <div class="loc"><span class="kicker">Project</span><code>.claude/skills/&lt;name&gt;/</code><p>Committed to the repo, so your team gets it on clone.</p></div>
+    <div class="loc"><span class="kicker">Plugin</span><code>/plugin install &lt;name&gt;</code><p>Packaged with commands and agents, shared through a marketplace.</p></div>
+  </div>
+  <div class="cmd"><code id="cmdText">mkdir -p ~/.claude/skills/meeting-notes &amp;&amp; $EDITOR ~/.claude/skills/meeting-notes/SKILL.md</code><button class="btn sm ghost" type="button" id="copyBtn">Copy</button></div>
+</section>
+
+<footer>
+  <span>Automata Learning Lab · O'Reilly Live Training: Hands-On Agent Skills</span>
+  <a href="https://code.claude.com/docs/en/skills">Claude Code Skills docs</a>
+</footer>
+</div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- terminal demo ---------- */
+const script = [
+  ['t-user', 'Acme AI emailed about a sponsored video. Is it worth it, and what should I charge?', 900],
+  ['t-dim', '  matching request against 3 skill descriptions…', 700],
+  ['t-tool', '<em>Skill</em>sponsor-reply  · loaded SKILL.md', 800],
+  ['t-tool', '<em>Read</em>inbox/acme-ai.eml', 600],
+  ['t-dim', '  ask: 1 dedicated video · offer: open · tool: Acme Agent SDK', 700],
+  ['t-ok', '? Gate 1: continue with research? (y/n)  y', 1000],
+  ['t-tool', '<em>Read</em>references/research-playbook.md', 600],
+  ['t-tool', '<em>WebFetch</em>acme.ai, docs, GitHub, Hacker News', 900],
+  ['t-tool', '<em>Bash</em>python scripts/yt_stats.py --out stats.json', 800],
+  ['t-tool', '<em>Bash</em>python scripts/rate_calc.py --stats stats.json --format dedicated', 800],
+  ['t-tool', '<em>Write</em>sponsors/acme-ai/04-reply-draft.md', 700],
+  ['t-ok', '✓ Go. Report, rate and draft reply saved. You send it.', 0],
+];
+let termTimer = null;
+function runTerm() {
+  clearTimeout(termTimer);
+  const body = $('#termBody');
+  body.innerHTML = '';
+  $('#termStatus').textContent = 'Running…';
+  let i = 0;
+  const caret = document.createElement('span');
+  caret.className = 'caret';
+  const next = () => {
+    caret.remove();
+    if (i >= script.length) { $('#termStatus').textContent = '1 Skill · 6 tool calls · simulated'; body.appendChild(caret); return; }
+    const [cls, html, wait] = script[i++];
+    const d = document.createElement('div');
+    d.className = 'ln ' + cls;
+    d.innerHTML = html;
+    body.appendChild(d);
+    body.appendChild(caret);
+    termTimer = setTimeout(next, reduce ? 0 : wait);
+  };
+  next();
+}
+$('#termBtn').onclick = runTerm;
+$('#replay').onclick = () => { $('.term').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); runTerm(); };
+runTerm();
+
+/* ---------- agent loop ---------- */
+const steps = [
+  { t: 'Gather context', d: 'Claude reads before it writes. It searches the repo, opens files and loads any Skill whose description matches the request.', tools: ['Read', 'Grep', 'Glob', 'WebFetch', 'Skill'], ex: '● Grep "def rate" scripts/\n● Read scripts/rate_calc.py (lines 40–90)\n● Skill sponsor-reply' },
+  { t: 'Take action', d: 'Claude edits files, runs shell commands and calls external tools. Permission modes decide what it may do without asking you first.', tools: ['Edit', 'Write', 'Bash', 'MCP tools'], ex: '● Edit scripts/rate_calc.py\n● Bash python scripts/rate_calc.py --views 12000\n  → wrote 03-rate.md' },
+  { t: 'Verify the result', d: 'Claude checks its own work. It runs the tests, reads the output and compares it with the goal. A failure sends it back to gather more context.', tools: ['Bash: tests', 'Read output', 'Diff'], ex: '● Bash pytest -q\n  2 passed, 1 failed\n→ back to Gather: read the failing test' },
+];
+const pos = [[210, 60], [331, 270], [89, 270]];
+let cur = 0, loopAuto = true, loopTimer;
+function setStep(i, user) {
+  cur = i;
+  if (user) loopAuto = false;
+  $$('.node').forEach(n => n.classList.toggle('on', +n.dataset.step === i));
+  const s = steps[i];
+  $('#loopKicker').textContent = `Step ${i + 1} of 3`;
+  $('#loopTitle').textContent = s.t;
+  $('#loopText').textContent = s.d;
+  $('#loopTools').innerHTML = s.tools.map(t => `<span class="tag">${t}</span>`).join('');
+  $('#loopEx').textContent = s.ex;
+}
+$$('.node').forEach(n => {
+  n.addEventListener('click', () => setStep(+n.dataset.step, true));
+  n.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setStep(+n.dataset.step, true); } });
+});
+setStep(0);
+// dot travels the ring clockwise: 0 → 1 → 2 → 0
+const dot = $('#loopDot');
+let ang = -Math.PI / 2;
+function tick() {
+  ang += 0.012;
+  if (ang > Math.PI * 1.5) ang -= Math.PI * 2;
+  dot.setAttribute('cx', 210 + 140 * Math.cos(ang));
+  dot.setAttribute('cy', 200 + 140 * Math.sin(ang));
+  // nodes sit at -90°, 30°, 150°; the step is the last node the dot passed
+  const seg = ang < Math.PI / 6 ? 0 : ang < Math.PI * 5 / 6 ? 1 : 2;
+  if (loopAuto && seg !== cur) setStep(seg);
+  requestAnimationFrame(tick);
+}
+if (!reduce) requestAnimationFrame(tick);
+
+/* ---------- anatomy ---------- */
+const files = {
+  skill: { role: 'The entry point', when: '<b>Loads:</b> the frontmatter is always visible to Claude. The body loads when a request matches the description.', body:
+`<span class="k">---
+name: sponsor-reply
+description: Research an inbound sponsor and draft the reply.
+  Use whenever Lucas mentions a sponsor, sponsorship, brand deal,
+  "is this one worth it", "what should I charge for a video"…
+---</span>
+
+# Sponsor reply workflow
+
+<span class="c">## The shape of a run</span>
+0. Get the email
+1. Extract request + offer + tool  →  GATE 1: ask Lucas to continue
+2. Research company &amp; tool         →  go/no-go report
+3. Compute the rate                →  from live YouTube stats
+4. Draft the reply                 →  Lucas sends it himself
+
+<span class="c">## Step 2: Research</span>
+Follow references/research-playbook.md …
+<span class="c">## Step 3: Rate</span>
+Run scripts/yt_stats.py, then scripts/rate_calc.py …` },
+  rate: { role: 'Reference', when: '<b>Loads:</b> only in step 3, when SKILL.md tells Claude to read it.', body:
+`# Rate card, formula, and floors
+
+<span class="c">## Where the numbers come from</span>
+The observed section holds what was actually quoted to
+real sponsors. It is the calibration anchor: any formula
+that outputs less than past quotes is wrong.
+
+| Line item                       | Quoted |
+|---------------------------------|--------|
+| Dedicated video + link in bio   | …      |
+| 90-day paid-ad usage rights     | …      |
+| Cross-post add-on, per platform | …      |` },
+  research: { role: 'Reference', when: '<b>Loads:</b> only in step 2, the research phase.', body:
+`# Research playbook
+
+1. Company site: pricing page, team page, funding.
+2. Docs and repo: stars, last commit, open issues.
+3. Hacker News and Reddit: what users say unprompted.
+4. Red flags: burner domain, affiliate-only offer,
+   no public product.
+
+Write findings to 02-research.md with a go/no-go line.` },
+  security: { role: 'Reference', when: '<b>Loads:</b> only if Claude needs to test the sponsor\'s tool. Gate 2 asks you first.', body:
+`# Security rubric
+
+Before any sponsor code runs on this machine:
+- Read the install script. No curl | sh.
+- Check requested permissions and network calls.
+- Run inside a throwaway container.
+
+<span class="k">GATE 2: ask before executing anything.</span>` },
+  templates: { role: 'Reference', when: '<b>Loads:</b> only in step 4, when drafting the reply.', body:
+`# Reply templates
+
+<span class="c">## Yes, with rate</span>
+Hi {name}, thanks for reaching out about {tool}…
+
+<span class="c">## Polite no</span>
+Hi {name}, I looked into {tool} and it isn't a fit
+for my audience right now…` },
+  yt: { role: 'Script', when: '<b>Runs:</b> Claude executes it with Bash. The code never enters context; only the JSON output does.', body:
+`<span class="c"># Fetch live channel stats from the YouTube Data API</span>
+<span class="c"># usage: python yt_stats.py --out stats.json</span>
+
+key = os.environ["YOUTUBE_API_KEY"]
+channel = os.environ["YOUTUBE_CHANNEL_HANDLE"]
+...
+json.dump({"subs": subs, "median_views": med}, out)` },
+  calc: { role: 'Script', when: '<b>Runs:</b> deterministic math beats asking the model to do arithmetic. Only the result enters context.', body:
+`p = argparse.ArgumentParser()
+src.add_argument("--stats", help="stats.json from yt_stats.py")
+src.add_argument("--views", type=int, help="expected views")
+p.add_argument("--format", choices=STATIC_CPM, default="dedicated")
+p.add_argument("--tier", choices=TIER, default="mid")
+p.add_argument("--currency", choices=["USD", "EUR"], default="USD")` },
+};
+function showFile(k) {
+  const f = files[k];
+  $$('#tree button').forEach(b => b.classList.toggle('on', b.dataset.f === k));
+  $('#vName').textContent = $(`#tree button[data-f="${k}"]`).firstChild.textContent;
+  $('#vRole').textContent = f.role;
+  $('#vBody').innerHTML = f.body;
+  $('#vWhen').innerHTML = f.when;
+}
+$$('#tree button').forEach(b => b.onclick = () => showFile(b.dataset.f));
+showFile('skill');
+
+/* ---------- progressive disclosure ---------- */
+// tokens ≈ file bytes / 4, from the course's Skill files
+const SK = [
+  { n: 'sponsor-reply', d: 'Research an inbound sponsor and draft the reply…', meta: 220, body: 2320, l3: 2800, l3txt: 'research-playbook.md, rate-card.md and the output of two scripts' },
+  { n: 'pdf-handout-lucas', d: 'Create a PDF handout for any topic, webpage or material…', meta: 50, body: 20, l3: 0 },
+  { n: 'test-skill', d: "Use when the user asks for 'testing skills' for teaching…", meta: 25, body: 80, l3: 0 },
+];
+const ALL = 11600; // every Skill file, scripts included, pasted into the prompt
+const SLICE = 12000;
+const Q = [0, 1, null]; // which skill each request matches
+let q = 0, level = 0;
+function renderDisc() {
+  const hit = Q[q];
+  $('#skRow').innerHTML = SK.map((s, i) => {
+    const st = level === 0 ? 'installed' : i === hit && level >= 2 ? (level >= 3 ? 'fully loaded' : 'body loaded') : 'metadata only';
+    return `<div class="sk ${i === hit && level >= 2 ? 'hit' : ''}"><div class="nm">${s.n}<span class="st">${st}</span></div><p>${esc(s.d)}</p></div>`;
+  }).join('');
+  $$('.lv').forEach(l => l.classList.toggle('on', +l.dataset.l <= level && (+l.dataset.l === 1 || hit !== null)));
+  const meta = level >= 1 ? SK.reduce((a, s) => a + s.meta, 0) : 0;
+  const body = hit !== null && level >= 2 ? SK[hit].body : 0;
+  const l3 = hit !== null && level >= 3 ? SK[hit].l3 : 0;
+  const [b1, b2, b3] = $$('#barSkills i');
+  b1.style.width = (meta / SLICE * 100) + '%';
+  b2.style.width = (body / SLICE * 100) + '%';
+  b3.style.width = (l3 / SLICE * 100) + '%';
+  $('#numSkills').textContent = (meta + body + l3).toLocaleString() + ' tok';
+  $('#barAll').style.width = level >= 1 ? Math.min(100, ALL / SLICE * 100) + '%' : '0';
+  $('#numAll').textContent = level >= 1 ? ALL.toLocaleString() + ' tok' : '0 tok';
+  const max = hit === null ? 1 : SK[hit].l3 ? 3 : 2;
+  const v = [
+    'Press Next step to start a session.',
+    hit === null ? 'Session starts. Claude sees three short descriptions. None of them matches a failing test, so no Skill body will load.' : 'Session starts. Claude sees three short descriptions and nothing else.',
+    hit === null ? '' : `The request matches ${SK[hit].n}. Claude reads its SKILL.md${SK[hit].l3 ? '.' : ', which points to no other files. Loading stops here.'}`,
+    hit === null ? '' : `Claude follows the instructions and opens ${SK[hit].l3txt}.`,
+  ];
+  $('#verdict').textContent = v[Math.min(level, 3)];
+  $('#stepBtn').disabled = level >= max;
+  $('#stepBtn').style.opacity = level >= max ? .4 : 1;
+}
+$$('.chip').forEach(c => c.onclick = () => {
+  q = +c.dataset.q; level = 0;
+  $$('.chip').forEach(x => { x.classList.toggle('on', x === c); x.setAttribute('aria-checked', x === c); });
+  renderDisc();
+});
+$('#stepBtn').onclick = () => { level++; renderDisc(); };
+$('#resetBtn').onclick = () => { level = 0; renderDisc(); };
+renderDisc();
+
+/* ---------- builder ---------- */
+const STOP = new Set('a an the and or of to for in on with is are be this that it as by at from use when user says your you can me my i do does what into any'.split(' '));
+const words = s => [...new Set(s.toLowerCase().match(/[a-z0-9]+/g) || [])].filter(w => !STOP.has(w) && w.length > 2);
+function slug(s) { return s.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '') || 'my-skill'; }
+function renderBuild() {
+  const n = slug($('#fName').value);
+  const d = $('#fDesc').value.trim();
+  $('#pPath').textContent = `.claude/skills/${n}/SKILL.md`;
+  $('#pBody').innerHTML = `<span class="c">---</span>\nname: ${esc(n)}\ndescription: ${esc(d)}\n<span class="c">---</span>\n\n# ${esc(n.replace(/-/g, ' '))}\n\n${esc($('#fBody').value)}`;
+  $('#cmdText').textContent = `mkdir -p ~/.claude/skills/${n} && $EDITOR ~/.claude/skills/${n}/SKILL.md`;
+  const dw = new Set(words(d + ' ' + n.replace(/-/g, ' ')));
+  // light stemming so "notes" matches "note"
+  const stem = w => w.replace(/(ing|es|s)$/, '');
+  const ds = new Set([...dw].map(stem));
+  const tw = words($('#fTest').value);
+  const hits = tw.filter(w => ds.has(stem(w)));
+  const score = tw.length ? Math.round(Math.min(1, hits.length / Math.max(2, tw.length * 0.6)) * 100) : 0;
+  $('#mBar').style.width = score + '%';
+  $('#mNum').textContent = score + '%';
+  $('#mWords').innerHTML = tw.map(w => `<span class="tag ${hits.includes(w) ? 'hit' : ''}">${esc(w)}</span>`).join('');
+}
+['#fName', '#fDesc', '#fBody', '#fTest'].forEach(id => $(id).addEventListener('input', renderBuild));
+renderBuild();
+
+$('#copyBtn').onclick = async () => {
+  const t = $('#cmdText').textContent;
+  try { await navigator.clipboard.writeText(t); $('#copyBtn').textContent = 'Copied'; }
+  catch { const r = document.createRange(); r.selectNodeContents($('#cmdText')); getSelection().removeAllRanges(); getSelection().addRange(r); $('#copyBtn').textContent = 'Selected'; }
+  setTimeout(() => $('#copyBtn').textContent = 'Copy', 1600);
+};
+</script>
+</body>
+</html>

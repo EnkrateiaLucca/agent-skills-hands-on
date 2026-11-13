@@ -1,0 +1,158 @@
+/* ============================================================================
+   aesthetic-themes.css — Pillar 6 token themes for HTML learning artifacts
+   Part of the grounded-reading-interfaces skill.
+
+   Drop ONE theme's :root block into the artifact, then let the structural CSS
+   in reading-column.css consume the tokens. These give the "looks designed"
+   layer WITHOUT ornament — refined color, a real type pairing, spacing rhythm,
+   and consistent radius/shadow. All fonts are OS-shipped (the Artifact CSP
+   blocks web fonts). Each theme also ships a matching dark variant.
+
+   Token contract (structural CSS should reference only these names):
+     --bg --surface --surface-2 --border --text --muted --accent --accent-2
+     --accent-tint --ok --no --warn --warn-bg --mark
+     --font-body --font-display --font-ui
+     --step-1..--step-6 (spacing)   --fs-* (type scale)
+     --radius-sm --radius-lg --shadow
+   ============================================================================ */
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SHARED — type scale, spacing rhythm, radius/shadow (theme-independent).
+   Include this block once, then add ONE color+font theme below.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Modular type scale, ratio ~1.28, base 1.0625rem (~17px) */
+  --fs-body: 1.0625rem;
+  --fs-small: 0.875rem;
+  --fs-h3: 1.25rem;
+  --fs-h2: 1.75rem;
+  --fs-h1: 2.5rem;
+  --fs-display: 3rem;
+
+  --lh-body: 1.62;
+  --lh-heading: 1.15;
+
+  /* 8px spacing scale — base everything on these, never ad-hoc px */
+  --step-1: 0.5rem;
+  --step-2: 0.75rem;
+  --step-3: 1rem;
+  --step-4: 1.5rem;
+  --step-5: 2.5rem;
+  --step-6: 4rem;
+
+  --radius-sm: 8px;
+  --radius-lg: 14px;
+  --reading-max-width: 66ch;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   THEME 1 — EDITORIAL-WARM  (default recommendation)
+   Warm paper + warm ink + deep indigo accent. Quality serif body, serif
+   display. Reads like a well-set long-form article. Great for papers/books.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --bg:        #faf8f4;   /* warm off-white paper */
+  --surface:   #f3eee5;   /* warm neutral card */
+  --surface-2: #ece4d7;   /* one step deeper */
+  --border:    #e6ddcd;   /* hairline, tinted — never gray */
+  --text:      #262019;   /* warm near-black ink, not #000 */
+  --muted:     #7a7063;
+  --accent:    #3d3499;   /* deep indigo — signal, used sparingly */
+  --accent-2:  #b0552b;   /* warm rust — secondary, for rare 2nd signal */
+  --accent-tint:#ecebf7;  /* low-chroma accent wash */
+  --ok:  #1a7f37;  --no: #b42318;
+  --warn:#8a5a00;  --warn-bg:#fbf3df;
+  --mark:#ffe9a8;         /* highlight, warm */
+
+  --font-body:    Charter, "Bitstream Charter", "Sitka Text", Cambria, "Iowan Old Style", Georgia, serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Charter, Georgia, serif;
+  --font-ui:      ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --shadow: 0 1px 2px rgba(40,30,15,.04), 0 8px 24px -12px rgba(40,30,15,.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#191510; --surface:#221c15; --surface-2:#2b2419; --border:#352c20;
+    --text:#ece4d6; --muted:#a89a86; --accent:#b3a7ff; --accent-2:#e0925f;
+    --accent-tint:#241f33; --warn:#e0b34d; --warn-bg:#241d0f; --mark:#4d3f18;
+    --ok:#5ac47b; --no:#f0776b;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.6);
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   THEME 2 — TECHNICAL-COOL  (alt: swap this :root in place of Theme 1)
+   Cool slate paper + system-sans body + tight sans display. Feels like clean
+   product/engineering docs. Better for API/reference/technical explainers.
+   ─────────────────────────────────────────────────────────────────────────
+:root {
+  --bg:#fbfcfd; --surface:#f1f4f8; --surface-2:#e7ecf2; --border:#dde3ea;
+  --text:#1c2430; --muted:#5c6675; --accent:#0f766e; --accent-2:#3f4ce0;
+  --accent-tint:#e5f2f0; --ok:#0f766e; --no:#b42318;
+  --warn:#8a5a00; --warn-bg:#fbf3df; --mark:#cdeee9;
+  --font-body:   ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display:ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-ui:     ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --shadow: 0 1px 2px rgba(20,30,45,.05), 0 8px 24px -12px rgba(20,30,45,.16);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#0f1418; --surface:#171e25; --surface-2:#1f2830; --border:#28323c;
+    --text:#e4eaf0; --muted:#93a0ae; --accent:#5eead4; --accent-2:#a5b4fc;
+    --accent-tint:#152a28; --warn:#e0b34d; --warn-bg:#221c0f; --mark:#173b37;
+    --ok:#5eead4; --no:#f0776b;
+  }
+}
+*/
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   THEME 3 — NOTEBOOK  (alt)
+   Near-neutral paper, ink-black display, single warm-amber accent, mono
+   display headings. Study-guide / lab-notebook feel; pairs well with code.
+   ─────────────────────────────────────────────────────────────────────────
+:root {
+  --bg:#fcfbf9; --surface:#f4f2ee; --surface-2:#eae7e0; --border:#e2ded6;
+  --text:#20201e; --muted:#6f6c64; --accent:#a45a12; --accent-2:#2f6f5f;
+  --accent-tint:#f6ecdf; --ok:#2f6f5f; --no:#b42318;
+  --warn:#8a5a00; --warn-bg:#f8f0dd; --mark:#ffe7b0;
+  --font-body:   "Iowan Old Style", Charter, "Sitka Text", Cambria, Georgia, serif;
+  --font-display:ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, monospace;
+  --font-ui:     ui-sans-serif, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --shadow: 0 1px 2px rgba(30,25,15,.05), 0 10px 26px -14px rgba(30,25,15,.2);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:#17150f; --surface:#201d15; --surface-2:#29251b; --border:#332e22;
+    --text:#eae5d8; --muted:#a49c88; --accent:#e0a24d; --accent-2:#67b8a4;
+    --accent-tint:#2a2213; --warn:#e0b34d; --warn-bg:#241d0f; --mark:#4a3d1a;
+    --ok:#67b8a4; --no:#f0776b;
+  }
+}
+*/
+
+
+/* ─────────────────────────────────────────────────────────────────────────
+   REFERENCE — how the structural CSS should consume the tokens.
+   (These selectors show the intended wiring; copy what you need into the
+   artifact's own <style>, adapting class names.)
+   ───────────────────────────────────────────────────────────────────────── */
+/*
+body        { background:var(--bg); color:var(--text); font-family:var(--font-body);
+              font-size:var(--fs-body); line-height:var(--lh-body); }
+.col        { max-width:var(--reading-max-width); margin-inline:auto; padding-inline:var(--step-3); }
+h1,h2,h3    { font-family:var(--font-display); line-height:var(--lh-heading); text-wrap:balance; }
+h1          { font-size:var(--fs-h1); letter-spacing:-0.02em; }
+p           { text-wrap:pretty; }
+.eyebrow    { font-family:var(--font-ui); font-size:var(--fs-small); font-weight:700;
+              letter-spacing:.09em; text-transform:uppercase; color:var(--accent); }
+table       { font-variant-numeric:tabular-nums; }               // align stat digits
+.tldr       { background:var(--accent-tint); border-radius:var(--radius-lg); box-shadow:var(--shadow); }
+.callout    { background:var(--surface); border-left:3px solid var(--accent); border-radius:var(--radius-sm); }
+.callout.warn { background:var(--warn-bg); border-left-color:var(--warn); }
+a           { color:var(--accent); text-underline-offset:2px; }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+*/

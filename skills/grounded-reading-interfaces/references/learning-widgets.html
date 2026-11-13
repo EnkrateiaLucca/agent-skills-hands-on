@@ -1,0 +1,289 @@
+<!-- ============================================================================
+     learning-widgets.html — copy-paste active-learning patterns
+     Part of the grounded-reading-interfaces skill (Pillars 4 & 5).
+
+     These implement the half of the skill that pure typography can't: forcing
+     small effortful acts of retrieval/generation that break the fluency
+     illusion (Roediger & Karpicke; Bisra et al.; Bjork). Each is zero- or
+     minimal-JS, keyboard- and screen-reader-accessible, and self-contained.
+
+     Copy only what the artifact needs. Styling assumes the CSS variables from
+     reading-column.css are present; inline fallbacks are noted where useful.
+     ============================================================================ -->
+
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     1. RETRIEVAL PROMPT  (strongest evidence: g≈0.61, "high utility")
+     Place after every conceptual chunk. Phrase the summary as a QUESTION so the
+     reader attempts recall BEFORE revealing. Native <details> = no JS needed.
+     ───────────────────────────────────────────────────────────────────────── -->
+<details class="recall">
+  <summary>Test yourself: Why does exponential backoff beat a fixed retry delay?</summary>
+  <div class="recall__answer">
+    <p>Because it spreads retries progressively further apart as failures persist,
+    which prevents a "thundering herd" of clients all retrying in lockstep and
+    overwhelming a recovering service.</p>
+  </div>
+</details>
+
+<style>
+  .recall {
+    border: 1px solid var(--color-border, #e2e2e2);
+    border-left: 4px solid var(--color-accent, #1d4ed8);
+    border-radius: 4px;
+    margin: 1.5rem 0;
+    background: var(--color-callout-bg, #f4f6fb);
+  }
+  .recall > summary {
+    cursor: pointer;
+    padding: 0.85rem 1.1rem;
+    font-weight: 600;
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    list-style: none;
+  }
+  .recall > summary::before { content: "🧠 "; }
+  .recall > summary::-webkit-details-marker { display: none; }
+  .recall > summary:focus-visible { outline: 2px solid var(--color-accent, #1d4ed8); }
+  .recall__answer { padding: 0 1.1rem 1rem; }
+  .recall__answer > :last-child { margin-bottom: 0; }
+</style>
+
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     2. SELF-EXPLANATION / GENERATION PROMPT  (g≈0.40–0.56)
+     Reader produces an answer BEFORE seeing the model answer. The textarea makes
+     the generation act real; the model answer is for self-comparison (a page
+     can prompt generation but cannot grade it — say so).
+     ───────────────────────────────────────────────────────────────────────── -->
+<div class="generate">
+  <p class="generate__prompt">✍️ <strong>Explain it first:</strong> In your own words, why is
+  idempotency required for safe retries? Write it, THEN reveal.</p>
+  <textarea class="generate__input" rows="3" placeholder="Your explanation…"></textarea>
+  <details class="recall">
+    <summary>Reveal model answer (compare against yours)</summary>
+    <div class="recall__answer">
+      <p>Retries can deliver the same request more than once. If the operation is
+      idempotent, repeated delivery has the same effect as one delivery, so a
+      duplicate retry can't double-charge, double-insert, etc.</p>
+    </div>
+  </details>
+</div>
+
+<style>
+  .generate { margin: 1.5rem 0; }
+  .generate__input {
+    width: 100%; box-sizing: border-box; margin: 0.5rem 0 0.75rem;
+    padding: 0.6rem 0.75rem; font: inherit; font-size: 0.95rem;
+    border: 1px solid var(--color-border, #e2e2e2); border-radius: 4px;
+    background: var(--color-bg, #fff); color: var(--color-text, #1a1a1a); resize: vertical;
+  }
+</style>
+
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     3. SECTION QUIZ  (retrieval + a little interleaving)
+     3–5 questions at a section boundary. Pull 1–2 from EARLIER sections too for
+     a within-page spacing/interleaving effect. Instant self-scored feedback.
+     ───────────────────────────────────────────────────────────────────────── -->
+<section class="quiz" aria-label="Self-check quiz">
+  <h3>Quick self-check</h3>
+
+  <fieldset class="quiz__q" data-answer="b">
+    <legend>1. A reader on a first pass consumes roughly what share of a page's words?</legend>
+    <label><input type="radio" name="q1" value="a"> ~80%</label>
+    <label><input type="radio" name="q1" value="b"> ~20–28%</label>
+    <label><input type="radio" name="q1" value="c"> ~55%</label>
+    <p class="quiz__fb" role="status"></p>
+  </fieldset>
+
+  <fieldset class="quiz__q" data-answer="a">
+    <legend>2. The screen-vs-paper comprehension penalty is mainly…</legend>
+    <label><input type="radio" name="q2" value="a"> metacognitive (overconfidence / fluency illusion)</label>
+    <label><input type="radio" name="q2" value="b"> purely a font-rendering problem</label>
+    <label><input type="radio" name="q2" value="c"> nonexistent</label>
+    <p class="quiz__fb" role="status"></p>
+  </fieldset>
+
+  <button class="quiz__check" type="button">Check answers</button>
+  <p class="quiz__score" role="status" aria-live="polite"></p>
+</section>
+
+<style>
+  .quiz { border: 1px solid var(--color-border,#e2e2e2); border-radius:6px; padding:1.25rem 1.5rem; margin:2rem 0; }
+  .quiz h3 { margin-top: 0; }
+  .quiz__q { border: 0; margin: 0 0 1rem; padding: 0; }
+  .quiz__q legend { font-weight: 600; padding: 0; margin-bottom: 0.4rem; }
+  .quiz__q label { display: block; padding: 0.2rem 0; cursor: pointer; }
+  .quiz__fb { margin: 0.35rem 0 0; font-size: 0.9rem; min-height: 1.1em; }
+  .quiz__fb.ok  { color: #1a7f37; }
+  .quiz__fb.no  { color: #b42318; }
+  .quiz__check {
+    font: inherit; font-family:-apple-system,Arial,sans-serif; font-weight:600;
+    padding: 0.5rem 1.1rem; border: 0; border-radius: 5px; cursor: pointer;
+    background: var(--color-accent,#1d4ed8); color: #fff;
+  }
+  .quiz__score { font-weight: 700; margin-top: 0.75rem; }
+</style>
+
+<script>
+  document.querySelectorAll('.quiz').forEach(quiz => {
+    quiz.querySelector('.quiz__check').addEventListener('click', () => {
+      let correct = 0, total = 0;
+      quiz.querySelectorAll('.quiz__q').forEach(q => {
+        total++;
+        const chosen = q.querySelector('input:checked');
+        const fb = q.querySelector('.quiz__fb');
+        if (!chosen) { fb.textContent = 'Pick an answer.'; fb.className = 'quiz__fb no'; return; }
+        if (chosen.value === q.dataset.answer) { correct++; fb.textContent = '✓ Correct'; fb.className = 'quiz__fb ok'; }
+        else { fb.textContent = '✗ Not quite — try recalling before you reread.'; fb.className = 'quiz__fb no'; }
+      });
+      quiz.querySelector('.quiz__score').textContent = `Score: ${correct}/${total}`;
+    });
+  });
+</script>
+
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     4. READING-PROGRESS BAR  (Pillar 5 — sustains scroll via "how much is left")
+     Thin fixed top bar. Purposeful, not ambient. Respects reduced-motion (no
+     smooth animation needed — width tracks scroll directly).
+     ───────────────────────────────────────────────────────────────────────── -->
+<div id="read-progress" aria-hidden="true"></div>
+<style>
+  #read-progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0;
+    background: var(--color-accent, #1d4ed8); z-index: 1000;
+  }
+</style>
+<script>
+  (function () {
+    const bar = document.getElementById('read-progress');
+    const update = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+    };
+    addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', update);
+    update();
+  })();
+</script>
+
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     5. AUTO-GENERATED TABLE OF CONTENTS  (Pillar 2 — vertical-scan navigation)
+     Builds a TOC from the page's <h2> elements so structure is navigable
+     without the reader rebuilding a mental map. Drop <nav id="auto-toc"> where
+     you want it (near the top, after the TL;DR).
+     ───────────────────────────────────────────────────────────────────────── -->
+<nav id="auto-toc" class="toc" aria-label="Contents"></nav>
+<script>
+  (function () {
+    const nav = document.getElementById('auto-toc');
+    if (!nav) return;
+    const heads = document.querySelectorAll('.reading-column h2, main h2');
+    if (!heads.length) { nav.remove(); return; }
+    const ol = document.createElement('ol');
+    heads.forEach((h, i) => {
+      if (!h.id) h.id = 'sec-' + i;
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = '#' + h.id;
+      a.textContent = h.textContent;
+      li.appendChild(a); ol.appendChild(li);
+    });
+    nav.appendChild(ol);
+  })();
+</script>
+
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     6. SPACED-REVIEW NUDGE  (Pillar 4 — honest ceiling: nudge, can't enforce)
+     A static page can't force multi-day spacing. This localStorage banner is
+     the honest maximum: on a RETURN visit it reminds the reader to self-test.
+     Set data-key to something unique per artifact.
+     ───────────────────────────────────────────────────────────────────────── -->
+<div id="review-nudge" data-key="artifact:retry-patterns" hidden
+     style="background:var(--color-callout-bg,#f4f6fb);border:1px solid var(--color-border,#e2e2e2);
+            border-left:4px solid var(--color-accent,#1d4ed8);border-radius:4px;
+            padding:0.9rem 1.2rem;margin:1.5rem 0;">
+  <span id="review-nudge-text"></span>
+  <a href="#auto-toc" style="color:var(--color-accent,#1d4ed8);font-weight:600;">Jump to the self-checks →</a>
+</div>
+<script>
+  (function () {
+    const el = document.getElementById('review-nudge');
+    if (!el) return;
+    const key = el.dataset.key || 'artifact:default';
+    let last = null;
+    try { last = localStorage.getItem(key); } catch (e) { return; } // private mode / disabled
+    const now = Date.now();
+    if (last) {
+      const days = Math.floor((now - Number(last)) / 86400000);
+      if (days >= 1) {
+        document.getElementById('review-nudge-text').textContent =
+          `You last reviewed this ${days} day${days === 1 ? '' : 's'} ago — a quick self-test now is worth more than rereading. `;
+        el.hidden = false;
+      }
+    }
+    try { localStorage.setItem(key, String(now)); } catch (e) {}
+  })();
+</script>
+
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     7. EXPORT TO ANKI / FLASHCARDS  (Pillar 4 — hand spacing to real SRS)
+     True spaced repetition needs dedicated software. This harvests every
+     .recall Q&A on the page into a tab-separated file Anki imports directly
+     (Front<TAB>Back per line). This is the honest way to deliver "spacing."
+     ───────────────────────────────────────────────────────────────────────── -->
+<button id="export-anki" type="button"
+        style="font:inherit;font-family:-apple-system,Arial,sans-serif;font-weight:600;
+               padding:0.5rem 1.1rem;border:1px solid var(--color-accent,#1d4ed8);border-radius:5px;
+               background:transparent;color:var(--color-accent,#1d4ed8);cursor:pointer;margin:1.5rem 0;">
+  ⬇ Export self-tests to Anki (.txt)
+</button>
+<script>
+  (function () {
+    const btn = document.getElementById('export-anki');
+    if (!btn) return;
+    const clean = s => (s || '').replace(/\s+/g, ' ').trim();
+    btn.addEventListener('click', () => {
+      const rows = [];
+      document.querySelectorAll('details.recall').forEach(d => {
+        const q = clean(d.querySelector('summary')?.textContent).replace(/^(Test yourself:|Q:|Reveal.*)/i, '').trim();
+        const a = clean(d.querySelector('.recall__answer')?.textContent);
+        if (q && a) rows.push(q.replace(/\t/g, ' ') + '\t' + a.replace(/\t/g, ' '));
+      });
+      if (!rows.length) { alert('No self-test cards found on this page.'); return; }
+      const blob = new Blob([rows.join('\n')], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'flashcards.txt'; a.click();
+      URL.revokeObjectURL(url);
+    });
+  })();
+</script>
+
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     8. WORKED-EXAMPLE → FADE LADDER  (Pillar 4 — respects expertise reversal)
+     Novice sees the full walkthrough; expert collapses it. Progressive
+     disclosure resolves the novice/expert conflict without two page versions.
+     ───────────────────────────────────────────────────────────────────────── -->
+<div class="worked">
+  <p><strong>Goal:</strong> compute the capped backoff delay for retry #n.</p>
+  <details class="recall" open>
+    <summary>Show full worked example (novice)</summary>
+    <div class="recall__answer">
+      <p>1. base = 200ms. 2. delay = base × 2ⁿ. 3. cap at 30 000ms.
+      4. add jitter ±20%. For n=5: 200×32 = 6400ms, under cap, → 5120–7680ms after jitter.</p>
+    </div>
+  </details>
+  <details class="recall">
+    <summary>Show only the key formula (expert)</summary>
+    <div class="recall__answer">
+      <p><code>min(cap, base·2ⁿ) · (1 ± jitter)</code></p>
+    </div>
+  </details>
+</div>

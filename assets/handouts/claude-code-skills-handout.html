@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Claude Code and Agent Skills Handout</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Brand v2.1 monochrome. A4, three pages. */
+:root {
+  --ink: #0A0A0A; --g9: #2B2B2B; --g7: #3D3D3D; --g5: #595959; --g3: #A3A3A3; --g1: #E5E5E5; --g0: #FAFAFA;
+  --sans: "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", Menlo, monospace;
+}
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font: 400 9.6pt/1.5 var(--sans); color: var(--g7); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 210mm; height: 297mm; padding: 14mm 16mm 18mm; position: relative; overflow: hidden; page-break-after: always; display: flex; flex-direction: column; gap: 4.5mm; }
+.page:last-child { page-break-after: auto; }
+h1, h2, h3 { color: var(--ink); margin: 0; font-weight: 600; }
+h1 { font-size: 27pt; line-height: 1.02; letter-spacing: -0.035em; }
+h2 { font-size: 15pt; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 2.5mm; }
+h3 { font-size: 10.5pt; letter-spacing: -0.01em; margin-bottom: 1mm; }
+p { margin: 0; }
+p + p { margin-top: 1.6mm; }
+b { color: var(--ink); font-weight: 600; }
+code { font-family: var(--mono); font-size: 8.2pt; color: var(--ink); }
+.kicker { font: 400 7.5pt/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--g5); }
+.foot { position: absolute; left: 16mm; right: 16mm; bottom: 9mm; display: flex; justify-content: space-between; font: 400 7pt/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--g3); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+.card { border: 1px solid var(--g1); border-radius: 8px; padding: 4mm; }
+.fill { background: var(--g0); border-radius: 6px; padding: 4mm; }
+.dark { background: var(--ink); color: #D4D4D4; border-radius: 8px; padding: 4mm; }
+.dark b, .dark h3 { color: #fff; }
+pre { margin: 0; font: 400 7.8pt/1.55 var(--mono); white-space: pre-wrap; color: var(--ink); }
+.dark pre { color: #fff; }
+.dark .c { color: var(--g3); }
+.c { color: var(--g5); }
+ul { margin: 0; padding-left: 4mm; }
+li { margin: .6mm 0; }
+li::marker { color: var(--g3); }
+table { width: 100%; border-collapse: collapse; font-size: 8.6pt; }
+th { text-align: left; font: 400 6.8pt/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--g5); padding: 1.4mm 2.5mm; border-bottom: 1px solid var(--ink); }
+td { padding: 1.4mm 2.5mm; border-bottom: 1px solid var(--g1); vertical-align: top; }
+td:first-child { font-weight: 600; color: var(--ink); white-space: nowrap; }
+tr.me td { background: var(--g0); }
+td code, th code { font-size: 7.8pt; }
+
+/* cover band */
+.cover { background: var(--ink); color: #fff; margin: -14mm -16mm 0; padding: 12mm 16mm 8mm; display: grid; gap: 4mm; }
+.cover .kicker { color: var(--g3); }
+.cover h1 { color: #fff; }
+.cover .lede { font-size: 11.5pt; line-height: 1.45; color: #D4D4D4; max-width: 150mm; }
+.cover-meta { display: flex; justify-content: space-between; align-items: end; gap: 8mm; border-top: 1px solid var(--g9); padding-top: 4mm; }
+.made { font: 500 9pt/1 var(--mono); letter-spacing: .06em; color: #fff; border: 1px solid #fff; border-radius: 999px; padding: 2.2mm 4mm; white-space: nowrap; }
+.mark { display: flex; align-items: center; gap: 2.5mm; font-weight: 600; font-size: 9pt; color: #fff; }
+.mark i { width: 4mm; height: 4mm; background: #fff; border-radius: 1mm; display: block; }
+
+/* loop diagram */
+.loop { display: flex; align-items: stretch; gap: 0; }
+.loop .st { flex: 1; border: 1px solid var(--g1); border-radius: 8px; padding: 3.5mm; }
+.loop .st .n { font: 500 7pt/1 var(--mono); color: var(--g5); letter-spacing: .08em; }
+.loop .ar { width: 7mm; display: flex; align-items: center; justify-content: center; color: var(--g3); font-family: var(--mono); }
+.back { text-align: center; font: 400 7.5pt/1 var(--mono); color: var(--g5); letter-spacing: .06em; margin-top: 2mm; }
+
+/* levels */
+.lv { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm; }
+.lv > div { border-top: 2.5px solid var(--ink); padding-top: 2.5mm; }
+.lv > div:nth-child(2) { border-color: var(--g5); }
+.lv > div:nth-child(3) { border-color: var(--g3); }
+.bar { height: 5mm; display: flex; border: 1px solid var(--g1); border-radius: 3px; overflow: hidden; margin-top: 1.5mm; }
+.bar i { display: block; height: 100%; }
+.barrow { display: grid; grid-template-columns: 34mm 1fr 18mm; align-items: center; gap: 3mm; font-size: 8.4pt; }
+.barrow .num { font: 500 8pt/1 var(--mono); text-align: right; color: var(--ink); }
+
+.check li { list-style: none; position: relative; padding-left: 1mm; }
+.check li::before { content: ""; position: absolute; left: -4mm; top: 1.3mm; width: 2.4mm; height: 2.4mm; border: 1px solid var(--g5); border-radius: 2px; }
+.kbd { font: 500 7.6pt/1 var(--mono); border: 1px solid var(--g3); border-bottom-width: 2px; border-radius: 3px; padding: .5mm 1.4mm; color: var(--ink); white-space: nowrap; }
+.tree { white-space: pre; font: 400 8pt/1.6 var(--mono); color: var(--ink); }
+.tree .c { color: var(--g5); }
+</style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<div class="page">
+  <div class="cover">
+    <div class="mark"><i></i>Automata Learning Lab</div>
+    <p class="kicker">Handout · Hands-On Agent Skills</p>
+    <h1>Claude Code and Agent Skills: the basics</h1>
+    <p class="lede">Claude Code is an AI agent that works in your terminal. Agent Skills are folders of instructions and scripts that teach it a specific job. This sheet covers both on three pages.</p>
+    <div class="cover-meta">
+      <span class="kicker">O'Reilly Live Training · Lucas Soares</span>
+      <span class="made">Made by Lucas Skills</span>
+    </div>
+  </div>
+
+  <div>
+    <p class="kicker">Part 1</p>
+    <h2>What Claude Code is</h2>
+    <div class="grid2">
+      <div>
+        <p>Claude Code runs Claude as an <b>agent</b>. You describe an outcome, and Claude reads files, runs shell commands, edits code and checks its own work until the job is done.</p>
+        <p>It runs in the terminal, in VS Code and JetBrains, in a desktop app and on the web. Every surface shares the same settings, memory and Skills.</p>
+      </div>
+      <div class="dark">
+        <h3>Install and start</h3>
+<pre><span class="c"># macOS / Linux</span>
+curl -fsSL https://claude.ai/install.sh | bash
+<span class="c"># or with npm</span>
+npm install -g @anthropic-ai/claude-code
+
+cd my-project
+claude          <span class="c"># interactive session</span>
+claude -p "…"   <span class="c"># one-shot, scriptable</span>
+claude -c       <span class="c"># continue last session</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h3>The agent loop</h3>
+    <div class="loop">
+      <div class="st"><span class="n">1 · GATHER</span><h3 style="margin-top:1.5mm">Gather context</h3><p>Search and read files, fetch docs, load a matching Skill.</p><p class="c" style="margin-top:1.5mm"><code>Read</code> <code>Grep</code> <code>Glob</code> <code>WebFetch</code></p></div>
+      <div class="ar">→</div>
+      <div class="st"><span class="n">2 · ACT</span><h3 style="margin-top:1.5mm">Take action</h3><p>Edit files, run commands, call external tools.</p><p class="c" style="margin-top:1.5mm"><code>Edit</code> <code>Write</code> <code>Bash</code> <code>MCP</code></p></div>
+      <div class="ar">→</div>
+      <div class="st"><span class="n">3 · VERIFY</span><h3 style="margin-top:1.5mm">Check the result</h3><p>Run tests, read output, compare with the goal.</p><p class="c" style="margin-top:1.5mm"><code>Bash: pytest</code> <code>diff</code></p></div>
+    </div>
+    <p class="back">↺ a failed check sends Claude back to step 1</p>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <h3>Commands you'll use daily</h3>
+      <table>
+        <tr><td><code>/init</code></td><td>Writes a CLAUDE.md that describes the project</td></tr>
+        <tr><td><code>/context</code></td><td>Shows what fills the context window</td></tr>
+        <tr><td><code>/compact</code></td><td>Summarizes the conversation to free space</td></tr>
+        <tr><td><code>/clear</code></td><td>Starts fresh in the same folder</td></tr>
+        <tr><td><code>/model</code></td><td>Switches the Claude model</td></tr>
+        <tr><td><code>/mcp</code></td><td>Connects outside tools and data</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>Keys and shortcuts</h3>
+      <table>
+        <tr><td><span class="kbd">Shift</span> <span class="kbd">Tab</span></td><td>Cycles modes: ask first, accept edits, plan</td></tr>
+        <tr><td><span class="kbd">Esc</span></td><td>Stops Claude mid-step so you can redirect it</td></tr>
+        <tr><td><span class="kbd">Esc</span> <span class="kbd">Esc</span></td><td>Rewinds to an earlier message</td></tr>
+        <tr><td><code>@file</code></td><td>Pulls a file into the prompt</td></tr>
+        <tr><td><code>!cmd</code></td><td>Runs a shell command directly</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>Claude Code + Agent Skills</span><span>1 / 3</span></div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page">
+  <div>
+    <p class="kicker">Part 2</p>
+    <h2>What an Agent Skill is</h2>
+    <p style="max-width:160mm">A Skill is a <b>folder with a SKILL.md file</b>. The file opens with YAML frontmatter (a name and a description) and continues with plain Markdown instructions. The folder can also hold reference documents and scripts. Claude reads the description, decides whether the Skill fits the request and loads the rest on its own.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Anatomy: the course's sponsor-reply Skill</h3>
+<div class="tree">sponsor-reply/
+├── SKILL.md           <span class="c">entry point, required</span>
+├── references/
+│   ├── research-playbook.md
+│   ├── rate-card.md
+│   ├── security-rubric.md
+│   └── reply-templates.md
+└── scripts/
+    ├── yt_stats.py    <span class="c">fetches channel stats</span>
+    └── rate_calc.py   <span class="c">computes the quote</span></div>
+      <p style="margin-top:2mm">References hold knowledge Claude reads when needed. Scripts handle deterministic work like API calls and arithmetic.</p>
+    </div>
+    <div class="dark">
+      <h3>SKILL.md</h3>
+<pre>---
+name: meeting-notes
+description: Turn a meeting transcript
+  into notes with decisions, owners and
+  deadlines. Use when the user shares a
+  transcript or recording, or says
+  "summarize this call" or "what did
+  we decide".
+---
+
+# Meeting notes
+
+1. Read the transcript.
+2. List each decision with its owner.
+3. List action items with deadlines.
+4. Use the format in
+   references/template.md.</pre>
+    </div>
+  </div>
+
+  <div>
+    <h3>Progressive disclosure: how a Skill loads</h3>
+    <p style="margin-bottom:3mm">Claude never loads every Skill in full. It loads each one in up to three levels, and stops at the level the task needs. You can install dozens of Skills and pay almost nothing for the ones a task doesn't use.</p>
+    <div class="lv">
+      <div><span class="kicker">Level 1 · always</span><h3 style="margin-top:1mm">Name + description</h3><p>Loaded at startup for every installed Skill. Roughly 30–200 tokens each.</p></div>
+      <div><span class="kicker">Level 2 · on match</span><h3 style="margin-top:1mm">SKILL.md body</h3><p>Read when a request fits the description. Keep it under about 500 lines.</p></div>
+      <div><span class="kicker">Level 3 · on demand</span><h3 style="margin-top:1mm">References and scripts</h3><p>Opened when the instructions point there. A script runs, and only its output enters context.</p></div>
+    </div>
+  </div>
+
+  <div class="fill">
+    <h3>Example: sponsor-reply, measured</h3>
+    <p style="margin-bottom:2.5mm">Token counts estimated from the course's real Skill files at about 4 characters per token.</p>
+    <div class="barrow"><span>Session start</span><div class="bar"><i style="width:2.5%;background:var(--ink)"></i></div><span class="num">~300</span></div>
+    <div class="barrow" style="margin-top:1.5mm"><span>Request matches</span><div class="bar"><i style="width:2.5%;background:var(--ink)"></i><i style="width:20%;background:var(--g5)"></i></div><span class="num">~2,600</span></div>
+    <div class="barrow" style="margin-top:1.5mm"><span>Research + rate step</span><div class="bar"><i style="width:2.5%;background:var(--ink)"></i><i style="width:20%;background:var(--g5)"></i><i style="width:24%;background:var(--g3)"></i></div><span class="num">~5,400</span></div>
+    <div class="barrow" style="margin-top:1.5mm"><span>All files in prompt</span><div class="bar"><i style="width:100%;background:repeating-linear-gradient(135deg,var(--g3) 0 2px,transparent 2px 5px)"></i></div><span class="num">~11,600</span></div>
+  </div>
+  <div class="foot"><span>Claude Code + Agent Skills</span><span>2 / 3</span></div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page">
+  <div>
+    <p class="kicker">Part 3</p>
+    <h2>Writing a Skill that works</h2>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <h3>The description decides when it fires</h3>
+      <p>Claude picks a Skill by reading its description, so the description carries the most weight in the file.</p>
+      <ul style="margin-top:1.5mm">
+        <li>Say <b>what</b> the Skill does and <b>when</b> to use it.</li>
+        <li>List the phrases people actually type: "summarize this call", "what did we decide".</li>
+        <li>Name the inputs it handles: a transcript, a PDF, a URL.</li>
+        <li>Write in the third person and stay under 1,024 characters.</li>
+      </ul>
+      <div class="grid2" style="gap:3mm;margin-top:3mm">
+        <div class="card" style="padding:3mm"><span class="kicker">Weak</span><p style="margin-top:1mm"><code>description: Helps with meetings.</code></p></div>
+        <div class="card" style="padding:3mm;border-color:var(--ink)"><span class="kicker">Strong</span><p style="margin-top:1mm"><code>Turn a meeting transcript into notes with decisions and owners. Use when…</code></p></div>
+      </div>
+    </div>
+    <div>
+      <h3>The body: instructions Claude can follow</h3>
+      <ul>
+        <li>Write steps in order, the way you'd brief a new colleague.</li>
+        <li>Explain <b>why</b> a rule exists, so Claude handles edge cases well.</li>
+        <li>Move long reference material into <code>references/</code> and link to it.</li>
+        <li>Put repeatable logic in <code>scripts/</code>. Code is cheaper and more reliable than reasoning through the same steps every time.</li>
+        <li>Add a gate wherever a human must approve: sending, paying, running outside code.</li>
+        <li>Test with real requests, and rewrite the description when the Skill misfires.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div>
+    <h3>Where to put a Skill</h3>
+    <div class="grid3">
+      <div class="card"><span class="kicker">Personal</span><p style="margin-top:1mm"><code>~/.claude/skills/&lt;name&gt;/</code></p><p>Works in every project on your machine.</p></div>
+      <div class="card"><span class="kicker">Project</span><p style="margin-top:1mm"><code>.claude/skills/&lt;name&gt;/</code></p><p>Commit it, and your team gets it on clone.</p></div>
+      <div class="card"><span class="kicker">Plugin or Claude.ai</span><p style="margin-top:1mm"><code>/plugin install</code> or upload a zip</p><p>Share through a marketplace, or use in the Claude apps.</p></div>
+    </div>
+  </div>
+
+  <div>
+    <h3>Skills next to the other ways to shape Claude Code</h3>
+    <table>
+      <tr><th>Feature</th><th>When it loads</th><th>Who triggers it</th><th>Best for</th></tr>
+      <tr><td>CLAUDE.md</td><td>Every session, in full</td><td>Always on</td><td>Project facts and house rules</td></tr>
+      <tr class="me"><td>Skill</td><td>Description always, body on match</td><td>Claude, or you with <code>/name</code></td><td>Repeatable workflows with scripts and references</td></tr>
+      <tr><td>Slash command</td><td>When you type it</td><td>You</td><td>Prompts you reuse by hand</td></tr>
+      <tr><td>MCP server</td><td>Tool list at startup</td><td>Claude calls its tools</td><td>Live access to Gmail, databases, APIs</td></tr>
+      <tr><td>Subagent</td><td>In its own context window</td><td>Claude delegates</td><td>Side tasks that would clutter the main thread</td></tr>
+    </table>
+  </div>
+
+  <div class="grid2">
+    <div class="dark">
+      <h3>Your first Skill in five minutes</h3>
+<pre>mkdir -p ~/.claude/skills/meeting-notes
+cd ~/.claude/skills/meeting-notes
+$EDITOR SKILL.md     <span class="c"># frontmatter + steps</span>
+claude               <span class="c"># start a new session</span>
+&gt; summarize this call transcript</pre>
+    </div>
+    <div>
+      <h3>Checklist before you share it</h3>
+      <ul class="check" style="padding-left:5mm">
+        <li><code>name</code>: lowercase letters, numbers and hyphens</li>
+        <li>The description says what it does and when to use it</li>
+        <li>SKILL.md stays under ~500 lines</li>
+        <li>Long material lives in <code>references/</code></li>
+        <li>Scripts run on their own and print clear output</li>
+        <li>No API keys in the folder. Use <code>.env</code></li>
+        <li>Three real requests trigger it correctly</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Docs: code.claude.com/docs/en/skills</span><span>3 / 3</span></div>
+</div>
+
+</body>
+</html>

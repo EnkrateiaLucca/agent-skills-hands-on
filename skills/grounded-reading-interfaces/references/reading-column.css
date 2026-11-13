@@ -1,0 +1,216 @@
+/* ============================================================================
+   reading-column.css — baseline stylesheet for HTML learning artifacts
+   Part of the grounded-reading-interfaces skill.
+
+   Grounded in (see references/evidence-base.md for sources + effect sizes):
+     Pillar 1 (typography):  Nanavati & Bias 2005; Baymard; WCAG 1.4.3/1.4.8/1.4.12
+     Pillar 2 (scanning):    NN/g layer-cake & F-pattern eye-tracking research
+     Pillar 3 (cognitive load): Mayer — Coherence, Signaling, Spatial contiguity
+     Pillar 5 (focus):       prefers-reduced-motion; no ambient motion
+
+   These are STARTING values. Adapt font stack, colors, and the accent to the
+   artifact's theme. The structural choices — max-width in `ch`, unitless
+   line-height, one-sided paragraph margins, near-black-on-off-white contrast,
+   the type scale, and the motion guard — are what carry the research; the
+   exact hex values are a sensible default, not doctrine.
+   ============================================================================ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Pillar 1 — the reading column. 65ch keeps ~50–75 chars/line.
+     Use 60ch for dense academic prose, up to 72ch for looser writing.
+     ch scales with font-size, so the character count stays correct on zoom. */
+  --reading-max-width: 65ch;
+
+  --font-size-body: 1.0625rem;      /* ~17px; never below 1rem/16px */
+  --line-height-body: 1.6;          /* 1.5–1.6; nudge up as the column widens */
+  --line-height-heading: 1.2;
+
+  --space-section: 3rem;            /* Pillar 3 segmenting: clear chunk boundary */
+  --space-paragraph: 1.5em;         /* WCAG 1.4.8: >= 1.5x line spacing */
+
+  /* Light theme — near-black on off-white, not pure #000 on #fff (comfort) */
+  --color-text: #1a1a1a;
+  --color-muted: #5a5a5a;
+  --color-bg: #fbfbf9;
+  --color-accent: #1d4ed8;
+  --color-callout-bg: #f4f6fb;
+  --color-callout-border: #1d4ed8;
+  --color-border: #e2e2e2;
+  --color-mark: #fff3bf;            /* signaling highlight, not decoration */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Off-white on dark-gray, never #fff on #000 (halation / astigmatism) */
+    --color-text: #e2e2e2;
+    --color-muted: #a0a0a0;
+    --color-bg: #121212;
+    --color-accent: #7ea8ff;
+    --color-callout-bg: #1b1f2a;
+    --color-callout-border: #7ea8ff;
+    --color-border: #2c2c2c;
+    --color-mark: #4d431a;
+  }
+}
+
+/* --- Base ------------------------------------------------------------------ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 100%; }           /* respect the user's browser/OS default */
+
+body {
+  margin: 0;
+  /* Serif reads well for long-form body text; either serif or sans is fine on
+     modern displays — pick per rendering quality, not category. */
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: var(--font-size-body);
+  font-weight: 400;                 /* never below 400 for reading text */
+  line-height: var(--line-height-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  text-align: left;                 /* never justify on the web */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Pillar 1: the reading column ----------------------------------------- */
+/* Apply .reading-column to the prose wrapper — NOT to figures/tables/diagrams
+   that may legitimately want to break wider than the text measure. */
+.reading-column {
+  max-width: var(--reading-max-width);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+.reading-column p {
+  margin: 0 0 var(--space-paragraph);   /* one-sided margin — avoids collapse quirks */
+}
+
+/* A load-bearing figure/diagram may exceed the text measure while staying
+   centered on the same optical axis as the prose. */
+.bleed-wide {
+  max-width: min(90ch, 100%);
+  margin-inline: auto;
+}
+
+/* --- Pillar 2: scan-friendly heading hierarchy ---------------------------- */
+/* Sans headings contrast against serif body and give the vertical left-edge
+   scan a clear structural ladder (layer-cake). Write them keyword-first. */
+h1, h2, h3, h4 {
+  font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+  line-height: var(--line-height-heading);
+  font-weight: 700;
+  text-wrap: balance;
+  margin: var(--space-section) 0 0.6rem;
+}
+h1 { font-size: 2rem;    margin-top: 0; letter-spacing: -0.01em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.2rem; }
+h4 { font-size: 1.05rem; color: var(--color-muted); }
+
+/* One logical chunk per section: visually bounded, independently scannable. */
+.section { margin-bottom: var(--space-section); }
+
+/* --- Pillar 3: signaling (reserve for load-bearing content, not decor) ---- */
+.key-claim { font-weight: 700; }
+
+mark, .highlight {
+  background: var(--color-mark);
+  padding: 0.05em 0.2em;
+  border-radius: 2px;
+}
+
+/* TL;DR / key-takeaways block — put in the first screenful.
+   Deliberately NOT ad-styled (no saturated block, no right-rail): inline,
+   subtly tinted, so it dodges banner blindness. */
+.tldr {
+  background: var(--color-callout-bg);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-accent);
+  border-radius: 4px;
+  padding: 1rem 1.4rem;
+  margin: 0 0 var(--space-section);
+}
+.tldr h2, .tldr h3 { margin-top: 0; font-size: 1.05rem; }
+.tldr ul { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+
+/* Callout for a definition, claim, or takeaway worth separating — not decor. */
+.callout {
+  background: var(--color-callout-bg);
+  border-left: 3px solid var(--color-callout-border);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 2px;
+}
+.callout > :last-child { margin-bottom: 0; }
+
+/* --- Pillar 3: spatial contiguity — figure sits with its explanation ------- */
+.figure-with-context { margin: 1.5rem 0; }
+.figure-with-context img,
+.figure-with-context svg { display: block; max-width: 100%; height: auto; }
+.figure-with-context figcaption {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* --- Pillar 2: table of contents (vertical-scan navigation) ---------------- */
+.toc {
+  max-width: var(--reading-max-width);
+  margin: 0 auto var(--space-section);
+  padding: 1rem 1.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.95rem;
+}
+.toc ol { margin: 0.4rem 0 0; }
+.toc a { color: var(--color-accent); text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+/* --- Readable code / tables (common in learning artifacts) ---------------- */
+code, pre, kbd {
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--color-callout-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+  overflow-x: auto;                 /* wide code scrolls in-place; body never does */
+  line-height: 1.5;
+}
+.reading-column table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+.reading-column th, .reading-column td {
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.7rem;
+  text-align: left;
+}
+.reading-column th { background: var(--color-callout-bg); }
+
+/* Wide content (tables, diagrams) scrolls inside its own box — the page body
+   must never scroll horizontally. */
+.scroll-x { overflow-x: auto; max-width: 100%; }
+
+/* --- Optional accessibility toggle (WCAG 1.4.12 minimums) ------------------ */
+/* Increase letter- AND word-spacing together — never one alone (it slows
+   reading). Toggle via a class on <body>. */
+.spacing-plus {
+  letter-spacing: 0.12em;
+  word-spacing: 0.16em;
+  line-height: 1.7;
+}
+
+/* --- Pillar 5: focus — no ambient motion ---------------------------------- */
+/* Only user-triggered, purposeful transitions. Nothing loops or autoplays. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
