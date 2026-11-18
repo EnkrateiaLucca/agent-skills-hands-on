@@ -16,6 +16,7 @@ Materials for the O'Reilly live training *Hands-On Agent Skills* (2 hours).
   - [`grounded-reading-interfaces/`](skills/grounded-reading-interfaces/): HTML study pages built on reading and retention research.
   - [`anti-ai-writing-slop/`](skills/anti-ai-writing-slop/): removes AI tells from prose.
   - [`explain-simply/`](skills/explain-simply/): explanations in Simplified Technical English.
+- [`assets/building-blocks/`](assets/building-blocks/index.html): interactive field guide to MCP, Skills, Projects, Subagents and Connectors, with a clickable map and linked Anthropic sources. Open `index.html` in a browser.
 - [`assets/whiteboard/`](assets/whiteboard/): the class whiteboard (Excalidraw). Serve the folder and open `view.html`, or rebuild it with `python build_whiteboard.py`.
 
 ## Running the sponsor-reply Skill
